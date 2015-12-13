@@ -2,17 +2,17 @@
 
 {% block left %}
   <div class="">
-  <h2 class="thread-submit-title">Communities join the world together.</h2>
+  <h2 class="thread-submit-title">Сообщества объединяют людей.</h2>
   <br>
   <div class="col-lg-10 thread-submit-box">
   {% from "macros.html" import render_field %}
   <form method="POST" action="." class="form bs-example form-horizontal">
     {{ form.csrf_token }}
-    {{ render_field(form.name, class="form-control", placeholder="name your community", autofocus="") }}
+    {{ render_field(form.name, class="form-control", placeholder="название сообщества", autofocus="") }}
     <br>
-    {{ render_field(form.desc, class="form-control", placeholder="and now describe it") }}
+    {{ render_field(form.desc, class="form-control", placeholder="описание сообщества") }}
     <br>
-    <button type="submit" value="Submit" class="btn btn-primary">Submit</button>
+    <button type="submit" value="Submit" class="btn btn-primary">Отправить</button>
   </form>
   </div>
   </div> 

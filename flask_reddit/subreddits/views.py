@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 """
-from flask import (Blueprint, request, render_template, flash, g,
-        session, redirect, url_for, abort)
+from flask import Blueprint, request, render_template, flash, g,session, redirect, url_for, abort
 from flask_reddit.frontends.views import get_subreddits, process_thread_paginator
 from flask_reddit.subreddits.forms import SubmitForm
 from flask_reddit.subreddits.models import Subreddit
@@ -29,7 +28,8 @@ def meets_subreddit_criterea(subreddit):
 def submit():
     """
     """
-    if g.user is None:
+
+    if g.user is None:        
         flash('You must be logged in to submit subreddits!', 'danger')
         return redirect(url_for('frontends.login', next=request.path))
 
@@ -69,7 +69,7 @@ def delete():
 @mod.route('/subreddits/view_all/', methods=['GET'])
 def view_all():
     """
-    """
+    """    
     return render_template('subreddits/all.html', user=g.user,
             subreddits=Subreddit.query.all())
 
