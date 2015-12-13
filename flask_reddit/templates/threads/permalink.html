@@ -21,9 +21,9 @@
     </div>
     <div class="col-lg-9 listing-text">
         <a href="{{ thread.link }}"><h2 class="listing-title">{{ thread.title }}</h2></a>
-        created {{ thread.pretty_date('created') }},
-        by <a href="{{ url_for('users.home_page', username=thread.user.username) }}">
-            {{ thread.user.username }}.</a> in <a href="{{ url_for('subreddits.permalink', 
+        создан {{ thread.pretty_date('created') }},
+        пользователем <a href="{{ url_for('users.home_page', username=thread.user.username) }}">
+            {{ thread.user.username }}.</a> в <a href="{{ url_for('subreddits.permalink', 
                 subreddit_name=thread.subreddit.name) }}">{{ thread.subreddit.name }}</a>
         <br>
         <br>
@@ -34,17 +34,17 @@
 <div>
     <div class="col-lg-6 thread-comment-section">
         {% if user is defined and user != None %}
-        <h5>Submit a comment:</h5>
+        <h5>Ответить:</h5>
         <div class="comment-form-parent">
             <textarea class="form-control thread-comment-box"></textarea>       
             <button class="btn btn-sm btn-primary submit-comment main-submit">
-                    Submit</button>
+                    Отправить</button>
         </div>
         {% else %}
         <br>
         <i>
-        <a href="{{ url_for('frontends.login') }}">Login</a> or 
-        <a href="{{ url_for('frontends.register') }}">register</a> to comment!
+        <a href="{{ url_for('frontends.login') }}">Войти</a> или 
+        <a href="{{ url_for('frontends.register') }}">зарегистрироваться</a> чтобы ответить!
         </i>
         {% endif %}
     </div>
@@ -53,7 +53,7 @@
 <div class="row"></div>
 <br>
 <div>
-    <h4>Comments section</h4>
+    <h4>Ответы</h4>
     <hr>
 </div>
 
@@ -63,14 +63,14 @@
             name="{{ comment.id }}"> 
             <p class="comment-body">{{ comment.text }}</p>
             <div class="post-listing-meta">
-                by: <a href="{{ url_for('users.home_page', username=comment.user.username) }}">
+                от: <a href="{{ url_for('users.home_page', username=comment.user.username) }}">
                     {{ comment.user.username }}</a> {{ comment.pretty_date() }} 
-                <a href="javascript:void(0)" class="comment-reply">reply</a>
+                <a href="javascript:void(0)" class="comment-reply">ответ</a>
             </div>
 
             <textarea class="nested-comment-text-box form-control"></textarea>
             <button class="btn btn-sm btn-primary submit-comment nested-submit-comment-button">
-                Submit</button>
+                Отправить</button>
         </div>
         {%- if comment.get_comments() -%}
             {{ loop(comment.get_comments()) }}
@@ -117,7 +117,7 @@ $(document).ready(function() {
         }
         
         if (comment_text == null || comment_text == '') {
-            alert("Please enter a valid comment!");
+            alert("Введите текст сообщения!");
             return;
         }
 
@@ -151,7 +151,7 @@ $(document).ready(function() {
                 }, 'json'
             );              
         {% else %}
-            alert("You must be logged in to do that!");
+            alert("Авторизуйтесь!");
         {% endif %}
     });
 

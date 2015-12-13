@@ -4,7 +4,7 @@
 <div class="col-lg-9 col-md-9 col-sm-7 col-xs-5 left-bar">
   {% block left %}
       {% if num_searches is defined %}
-        <h4 class="highlight">We have found {{ num_searches }} search results </h4>
+        <h4 class="highlight">Найдено результатов: {{ num_searches }}</h4>
         <br>
       {% endif %}
       <div class="spacer"></div>
@@ -38,12 +38,12 @@
 
               <div class="post-listing-meta">
                   <a href="{{ config.ROOT_URL }}/threads/{{ thread.subreddit.name }}/{{ thread.id }}/{{ thread.title|truncate(100)|replace(' ', '_') }}">
-                  {{ thread.comments.all()|length() }} comments</a>,
-                  {{ thread.pretty_date() }}, by 
+                  {{ thread.comments.all()|length() }} комментарии</a>,
+                  {{ thread.pretty_date() }}, от 
                   <a href="{{ url_for('users.home_page', 
                         username=thread.user.username) }}">
                         {{ thread.user.username }}</a> 
-                    in
+                    в
                     <a href="{{ url_for('subreddits.permalink', 
                         subreddit_name=thread.subreddit.name) }}">
                         {{ thread.subreddit.name }}
@@ -55,14 +55,14 @@
 
       <ul class="pager pull-left">
         {% if thread_paginator.has_prev %}
-            <li><a href="?page={{ thread_paginator.prev_num }}">prev</a></li>
+            <li><a href="?page={{ thread_paginator.prev_num }}"><<<</a></li>
         {% else %}
-            <li style="opacity:0.3;"><a>prev</a></li>
+            <li style="opacity:0.3;"><a><<<</a></li>
         {% endif %}
         {% if thread_paginator.has_next %}
-            <li><a href="?page={{ thread_paginator.next_num }}">next</a></li>
+            <li><a href="?page={{ thread_paginator.next_num }}">>>></a></li>
         {% else %}
-            <li style="opacity:0.3;"><a>next</a></li>
+            <li style="opacity:0.3;"><a>>>></a></li>
         {% endif %}
       </ul>
   {% endblock %}
@@ -82,24 +82,24 @@
         <form method="GET" action="/search/" class="" role="search">
             <div class="form-group">
                 <input type="text" name="query" class="reddit-search form-control" 
-                    placeholder="Search reddit!">
+                    placeholder="Поиск">
             </div>
             <!--<button type="submit" class="btn btn-default">Submit</button>-->
         </form> 
         {% if cur_subreddit is defined %}
             <a href="{{ url_for('threads.submit', subreddit_name=cur_subreddit.name) }}">
                 <button class="btn btn-primary submit-post-button">
-                    submit to {{ cur_subreddit.name }}</button>
+                    Опубликовать, {{ cur_subreddit.name }}</button>
             </a>
         {% else %}
             <a href="{{ url_for('threads.submit', subreddit_name='frontpage') }}">
-                <button class="btn btn-primary submit-post-button">submit post</button></a>
+                <button class="btn btn-primary submit-post-button">Отправить сообщение</button></a>
         {% endif %} 
         </div>
         <div class="row">
             <a href="{{ url_for('subreddits.submit') }}">
                 <button type="button" class="btn btn-primary 
-            inverse-white-button add-subreddit-button">create community +</button></a>
+            inverse-white-button add-subreddit-button">Создать сообщество</button></a>
     </div>
 
     {% if cur_subreddit is defined %}
@@ -110,19 +110,13 @@
 
     {% endblock %}
 
-    <h4 class="subreddit-desc">Subreddits</h4>
+    <h4 class="subreddit-desc">Субреддиты</h4>
     <ul id="subreddit-list">
         {% for subreddit in subreddits[:10] %}
         <li><a href="/r/{{ subreddit.name }}">{{ subreddit.name }}</a></li>
         {% endfor %}
     </ul>
-    <a class="align-right-col" href="{{ url_for('subreddits.view_all') }}">view all</a>
-    <i>
-    <div class="align-right-col byline-lucas">Built by: <a href="http://lucasou.com">Lucas Ou-Yang</a>.
-        <br>
-        <a href="https://github.com/codelucas/flask_reddit">
-            View code on Github</a>.</div>
-    </i>
+    <a class="align-right-col" href="{{ url_for('subreddits.view_all') }}">Показать все</a>    
   {% endblock %}
 </div>
 
@@ -152,7 +146,7 @@ $(document).ready(function() {
                 }, 'json'
             );
         {% else %}
-            alert("You must be logged in to do that!");
+            alert("Вы должны авторизоваться!");
         {% endif %}
     });
     //

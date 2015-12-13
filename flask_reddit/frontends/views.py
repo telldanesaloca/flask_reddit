@@ -82,7 +82,6 @@ def search():
     query = request.args.get('query')
     rs = search_module.search(query, orderby='creation', search_title=True,
             search_text=True, limit=100)
-
     thread_paginator = process_thread_paginator(rs=rs)
     rs = rs.all()
     num_searches = len(rs)
@@ -107,6 +106,7 @@ def login():
             next = request.args['next']
 
     form = LoginForm(request.form)
+
     # make sure data is valid, but doesn't validate password is right
     if form.validate_on_submit():
         # continue where we left off if so
@@ -129,6 +129,7 @@ def login():
 def logout():
     session.pop('user_id', None)
     return redirect(url_for('frontends.home'))
+
 
 @mod.route('/register/', methods=['GET', 'POST'])
 def register():

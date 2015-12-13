@@ -7,20 +7,20 @@
   <form method="POST" action="." class="form bs-example form-horizontal">
     {{ form.csrf_token }}
     <input type="hidden" name="next" value="{{ next }}" />
-    {{ render_field(form.username, class="form-control", placeholder="username", autofocus="") }}
+    {{ render_field(form.username, class="form-control", placeholder="Имя", autofocus="") }}
     <br>
-    {{ render_field(form.email, class="form-control", placeholder="email") }}
+    {{ render_field(form.email, class="form-control", placeholder="Email") }}
     <br>
-    {{ render_field(form.password, class="form-control", placeholder="password") }}
+    {{ render_field(form.password, class="form-control", placeholder="Пароль") }}
     <br>
-    {{ render_field(form.confirm, class="form-control", placeholder="confirm password") }}
+    {{ render_field(form.confirm, class="form-control", placeholder="Подтверждение пароля") }}
     <br>
-    Check to agree to <a href="">terms of services</a> 
+    Прочитать условия <a href="">предоставления услуг</a> 
         {{ render_field(form.accept_tos, class="form-control") }}
-    <label>ReCaptcha</label>
+    <label>Капча</label>
     {{ form.recaptcha }}
     <br>
-    <button type="submit" value="Register" class="btn btn-primary">Register</button>
+    <button type="submit" value="Register" class="btn btn-primary">Зарегистрироваться</button>
   </form>
   </div>
   </div>
