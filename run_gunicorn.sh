@@ -11,4 +11,4 @@
 # Normally, when you type "gunicorn" in your shell, the 
 # shell first creates a new process with fork, and 
 # then in the new process, runs exec.
-exec /home/red/Projects/reddit-env/bin/gunicorn -c /home/red/Projects/reddit-env/flask_reddit/server/gunicorn_config.py flask_reddit.wsgi
+exec /opt/board/venv/bin/gunicorn -c /opt/board/server/gunicorn_config.py flask_reddit.wsgi

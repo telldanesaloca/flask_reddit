@@ -3,7 +3,7 @@
 """
 import os
 import sys
-sys.path.insert(1, '/home/red/Projects/reddit-env/flask_reddit')
+sys.path.insert(1, '/opt/board/flask_reddit')
 import readline
 from pprint import pprint
 

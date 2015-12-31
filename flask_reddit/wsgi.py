@@ -2,7 +2,7 @@
 """
 """
 import sys
-sys.path.insert(1, '/home/red/Projects/reddit-env')
+sys.path.insert(1, '/opt/board/venv')
 
 from werkzeug.contrib.fixers import ProxyFix # needed for http server proxies
 from werkzeug.debug import DebuggedApplication
