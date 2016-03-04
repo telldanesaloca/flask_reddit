@@ -206,7 +206,9 @@ class Thread(db.Model):
         DEFAULT_THUMBNAIL = 'http://reddit.lucasou.com/static/imgs/reddit-camera.png'
         if self.link:
             thumbnail = media.get_top_img(self.link)
-        if not thumbnail:
+            if not thumbnail:
+                thumbnail = DEFAULT_THUMBNAIL
+        else:
             thumbnail = DEFAULT_THUMBNAIL
         self.thumbnail = thumbnail
         db.session.commit()

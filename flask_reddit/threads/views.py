@@ -28,14 +28,15 @@ def meets_thread_criterea(thread):
     if not thread.title:
         flash('You must include a title!', 'danger')
         return False
-    if not thread.text and not thread.link:
-        flash('You must post either body text or a link!', 'danger')
+    if not (thread.text or thread.link):
+        flash('You must post body text or a link!', 'danger')
         return False
 
-    dup_link = Thread.query.filter_by(link=thread.link).first()
-    if not thread.text and dup_link:
-        flash('someone has already posted the same link as you!', 'danger')
-        return False
+    if thread.link:
+        dup_link = Thread.query.filter_by(link=thread.link).first()
+        if not thread.text and dup_link:
+            flash('someone has already posted the same link as you!', 'danger')
+            return False
 
     return True
 
