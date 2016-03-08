@@ -1,133 +1,171 @@
-flask\_reddit
-=============
+Инструкция по развертыванию борды
+=================================
 
-**flask_reddit** is an extendable + minimalist [Reddit](http://reddit.com) clone.
+Этот проект поддерживается на данный момент командой [борды mipt.me](http://mipt.me). Любая помощь (багрепорты, перевод, дизайн, написание кода) горячо приветствуется. Если (вдруг) вы захотели пожертвовать деньги на развитие [борды](http://mipt.me), то пишите текущим разработчикам.
 
-This was built so beginners who want a standard CRUD + reddit-like application
-can quickly get to work.
+Этот проект -- форк [flask_reddit](https://github.com/codelucas/flask_reddit) от Lucas Ou-Yang.
 
-We utilize: 
-- `flask` as the web framework.
-- `nginx` as the HTTP server  
-- `gunicon` as the wsgi server.
-- `MySQL` for our database 
-- `flask-sqlalchemy` as our ORM.
-- `bootstrap-journal` theme makes us beautiful.
-- `virtualenv` emcompasses everything. 
-- `supervisord` makes sure our service never crashes.
+Установка
+---------
 
-And thats pretty much it!
+Протестирована на Ubuntu 14.04 LTS и Debian 8 Jessie. В качестве веб-сервера используется nginx, WSGI-сервер -- Gunicorn, СУБД -- MySQL. Приложение будет расположено в `/opt/board`, отдельный юзер для запуска борды `board`.
 
-All of the configutations are in this repository. Deployment instructions 
-will be out soon.
+0.  Настраиваем iptables по вкусу. Рекомендуемая схема: дефолтная политика DROP для внешних интерфейсов, открыть наружу порты 22 (SSH), 80 (HTTP) или 443 (HTTPS), установка правил на загрузке при помощи `iptables-persistent` (прописать правила в /etc/iptables/rules.v4, перезапустить с помощью `sudo service netfilter-persistent restart`).
 
-Features
---------
-- threaded comments
-- up voting
-- subreddits
-- user karma
-- search
-- rate limiting
-- ajax form posting
-- user profiles
+1.  Установливаем с помощью пакетного менеджера git, MySQL, nginx, supervisor и
+virtualenv для питона:
 
-Build Instructions
-------------------
+        $ sudo apt-get install git mysql-server libmysqlclient-dev nginx supervisor python-virtualenv python-dev
 
-- Set up an instance of MySQL on your server. Note your username and password.
+    При установке `mysql-server` требуется ввести пароль для пользователя root в БД. **Не забываем этот пароль!**
 
-```
-sudo apt-get update
-sudo apt-get upgrade
-sudo apt-get install mysql-server libmysqlclient-dev
-```
+2.  Создаем пользователя для борды и клонируем репозиторий:
 
-- Set up an instance of nginx on your server. *I've provided the .conf scripts needed for our
-servers in the `/server` directory.*
+        $ sudo useradd -d /opt/board -M -r -s /bin/false board
+        $ sudo mkdir /opt/board
+        $ sudo chown ${USER}:board /opt/board
+        $ git clone --depth=1 https://github.com/bo4ard/flask_reddit.git /opt/board
 
-`sudo apt-get nginx`
+3.  Настраиваем MySQL: пишем конфиг.
 
-- Configure your nginx settings located in `flask_reddit/server/nginx.conf`.
+    В файле `/etc/mysql/my.cnf` добавляем следующие опции в соответствующие разделы:
 
-- Add your settings into your global conf file located in `/etc/nginx/nginx.conf`
+        [client]
+        default-character-set = utf8
 
-- Restart nginx to recognize your settings `sudo service nginx restart`
+        [mysqld]
+        character-set-server = utf8
+        collation-server = utf8mb4_general_ci
+        init-connect = 'SET NAMES utf8'
 
-- Set up supervisord to monitor your project to make sure it never crashes.
-Supervisor is also convenient for simply restarting/starting your project with ease.
+    Также проверяем, что следующие опции выставлены именно так (с точностью до порядка):
 
-`sudo apt-get supervisor`
+        [mysqld]
+        bind-address = 127.0.0.1
+        port = 3306
+        user = mysql
 
-- When Supervisor is installed you can give it programs to start and watch by creating config 
-files in the `/etc/supervisor/conf.d` directory. I've provided the conf file which we use
-in the root directory of this repo as `supervisor.conf`. An example supervisor command 
-would be running `supervisorctl restart YOUR_APP_NAME` to restart gunicorn and bring up new changes.
+    Перезапускаем MySQL (например, `sudo service mysql restart`).
 
-- Install [virtualenv](http://www.virtualenv.org/en/latest/virtualenv.html) and set up a project 
-root where ever you want.
+    Опционально: проверяем, что всё влетело. Если всё нормально, то вывод должен соответствовать приведенному.
 
-```bash
-sudo apt-get install python-virtualenv;
-cd /path/to/project;
-virtualenv reddit-env;
-cd reddit-env;
-source bin/activate; # viola, you are now in an enclosed python workspace.
-```
+        $ sudo service mysql restart
+        $ mysql -u root -p
+        [вводим пароль для БД]
+        mysql> SHOW VARIABLES WHERE Variable_name LIKE 'character\_set\_%' OR Variable_name LIKE 'collation%';
+        +--------------------------+--------------------+
+        | Variable_name            | Value              |
+        +--------------------------+--------------------+
+        | character_set_client     | utf8               |
+        | character_set_connection | utf8               |
+        | character_set_database   | utf8               |
+        | character_set_filesystem | binary             |
+        | character_set_results    | utf8               |
+        | character_set_server     | utf8               |
+        | character_set_system     | utf8               |
+        | collation_connection     | utf8_general_ci    |
+        | collation_database       | utf8_general_ci    |
+        | collation_server         | utf8_general_ci    |
+        +--------------------------+--------------------+
+        10 rows in set (0.00 sec)
 
-- Download the repository and  install all of the required python modules 
-which this server uses.
+4.  Настраиваем MySQL - 2: создаем базу данных и юзера для борды. Входим в консольный клиент БД с помощью `mysql -u root -p`, вводя пароль для **рута в БД** (выйти можно, нажав Ctrl-D). После чего, следующими командами создаем базу данных и юзера для борды. `password` следует заменить на реальный пароль для бордового юзера.
 
-```bash
-git clone https://github.com/codelucas/flask_reddit.git;
-cd flask_reddit;
-pip install -r requirements.txt
-```
+        CREATE DATABASE board;
+        CREATE USER 'board'@'localhost' IDENTIFIED BY 'password';
+        GRANT CREATE,DROP,DELETE,INSERT,SELECT,UPDATE ON board.* TO 'board'@'localhost';
+        FLUSH PRIVILEGES;
 
-- Due to sensitive configuration information, I have hidden my personal
-`config.py` file in the gitignore. But, I have provided a clean and easy
-to use config template in this repo named `app_config.py`. 
+5.  Устанавливаем в virtualenv зависимости.
 
-- **Fill out the `flask_reddit/app_config.py` file with your own information and then rename it to
-`config.py` so flask recognizes it by using `mv app_config.py config.py`.**
-Please be sure to fill out the mysql db settings similarly to how you set it up!, 
-username, pass, etc
+        $ cd /opt/board
+        $ virtualenv venv
+        $ source venv/bin/activate    # активируем ("входим в") virtualenv
+        (venv)$ pip install -r requirements.txt   # выйти из virtualenv можно, набрав deactivate
 
-- Run the `kickstart.py` script to build the first user and subreddits.
+6.  Настраиваем приложение.
 
-`python2.7 kickstart.py`
+    Как образец можно использовать `app_config.py` в корне проекта.
 
-- flask_reddit has tasks which must **occur on regular time intervals**. To make this
-happen, we use the `crontab`, which is present on UNIX systems.
+    Абсолютно необходимо в опции `SECRET_KEY` указать достаточно длинную случайную последовательность из символов. Сгенерировать ее можно, например, так (в GNU/Linux):
 
-A crontab is a dash which allows you to specify what programs to run and how often.
-I've provided flask_reddit's example crontab in the root directory as `jobs.cron`.
+        $ dd if=/dev/urandom bs=64 count=1 2>/dev/null | base64 -w0
 
-To view your current crontab, run `crontab -l`. To edit your crontab, run `crontab -e`.
+    Также следует установить `DOMAIN` и `ROOT_URL` в нужные значения, `STATIC_ROOT` -- в `"/opt/board/flask_reddit/static"`, в `SQLALCHEMY_DATABASE_URI` указать тип СУБД, юзера, пароль и имя БД, например, `"mysql://board:password@localhost/board"`. Ключи для рекапчи можно получить, зарегавшись на соответствующей странице в Google.
 
-- Paste the contents of `jobs.cron` into your crontab by running `crontab -e` and 
-pasting! More directions are present in the `jobs.cron` file.
+    **NB!** Готовый конфиг должен называться `config.py` и лежать в корне проекта!
 
-- Run the gunicorn server. You won't have to do this ever again if `supervisor` is set up
-properly.
+7.  Настраиваем supervisor и gunicorn.
 
-`sudo sh run_gunicorn.sh`
+    Gunicorn настраивать, как таковой, не надо, нужный конфиг уже есть в дереве.
 
-**Note that we have now deployed two servers: `nginx` and `gunicorn`. `nginx` is our
-*internet facing* HTTP server on port 80 while `gunicorn` is our *wsgi server* which 
-is serving up our flask python application locally. `nginx` reads client
-requests and *decides* which requests to foreward to our `gunicorn` server. For example,
-`nginx` serves static content like images very well but it forwards url routes 
-to the homepage to gunicorn.**
+    Для supervisor можно также использовать готовый конфиг в корне проекта (`supervisor.conf`), который необходимо скопировать в `/etc/supervisor/conf.d/board.conf`.
 
-For a full list of details, view our configs at `server/nginx.conf` and 
-`server/gunicorn_config.py`.
+    С данными настройками веб-приложение будет работать по адресу localhost:8040. Чтобы вывести его наружу (и, возможно, держать несколько сайтов), необходим прокси в виде nginx.
 
-*Note, for this build to work there are paths that you must change in the `wsgi.py` file, 
-the server configs located in `server` directory and the `run_gunicorn.sh` file.*
+8.  Настраиваем виртуальный хост в nginx.
 
-*Refer to the flask project configuration options to understand what to put in your own
-config.py file.*
+    Создаем файл `/etc/nginx/sites-available/board` со следующим содержимым(`SERVER_DOMAIN` заменяем на домен сайта):
 
-Do not hesiate to <a href="http://lucasou.com">contact</a> me <Lucas Ou> for help or concerns.
+    ```
+    server {
+        listen 80;
+        server_name SERVER_DOMAIN;
 
+        location /static/ {
+            alias /opt/board/flask_reddit/static/;
+            expires max;
+        }
+
+        location / {
+            proxy_pass http://localhost:8040;
+            proxy_set_header X-Forwarded-Host $server_name;
+            proxy_set_header X-Real-IP $remote_addr;
+            add_header P3P 'CP="ALL DSP COR PSAa PSDa OUR NOR ONL UNI COM NAV"';
+        }
+    }
+    ```
+
+    После этого ставим симлинк на этот файл в `/etc/nginx/sites-enabled` и удаляем оттуда симлинк на default. Перезапускаем nginx.
+
+9.  Запускаем приложение.
+
+    Делаем начальные установки, запустив `python2.7 kickstart.py`, находясь в /opt/board в virtualenv. Перед этим можно поменять в этом скрипте э-почту рут-пользователя, его пароль и параметры основного субреддита.
+
+    Создаем директорию для логов приложения и запускаем его:
+
+        $ sudo mkdir /var/log/board
+        $ sudo chown board:board /var/log/board
+        $ sudo chmod 755 /var/log/board
+        $ sudo service supervisor restart
+        $ sudo supervisorctl status board
+
+    Если последняя команда дала вывод вроде
+
+        board                            RUNNING    pid 3534, uptime 0:00:27
+
+    то приложение запустилось успешно.
+
+10. Добавляем в крон регулярные задания.
+
+    Добавляем в кронтаб для юзера board следующую строку:
+
+        */1 * * * * PYTHONPATH=/opt/board:/opt/board/venv /opt/board/venv/bin/python /opt/board/scripts/set_hotness_all.py >> /var/log/board/set_hotness_all.log 2>&1
+
+    **NB!** Кронтаб нужно редактировать ТОЛЬКО с помощью команды `sudo crontab -u board -e`!
+
+
+Управление приложением
+----------------------
+
+Запуск/остановку приложения можно проводить с помощью команд `sudo supervisorctl start board` и `sudo supervisorctl stop board`.
+
+Логи приложения лежат в `/var/log/board/`, логи веб-сервера в `/var/log/nginx`.
+
+
+Некоторые соображения
+---------------------
+
+- При желании можно заменить supervisor на upstart-овый сервис или systemd-шный юнит.
+- Возможно, надежнее использовать LXC-контейнеры вместо virtualenv.
+- Похоже, что возможно вместо MySQL использовать MariaDB или PostgreSQL. Но такая конфигурация не тестировалась.

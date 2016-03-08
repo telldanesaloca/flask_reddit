@@ -112,7 +112,7 @@ def login():
         # continue where we left off if so
         user = User.query.filter_by(email=form.email.data).first()
         # we use werzeug to validate user's password
-        if user and check_password_hash(user.password, form.password.data):
+        if user and check_password_hash(str(user.password), form.password.data):
             # the session can't be modified as it's signed,
             # it's a safe place to store the user id
             session['user_id'] = user.id
