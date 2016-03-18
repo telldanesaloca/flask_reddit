@@ -11,9 +11,10 @@
                     Треды: <span class="red">{{ current_user.threads.all()|length() }}</span>, 
                     Комментарии: <span class="red">{{ current_user.comments.all()|length() }}</span><br> 
                     </p>
-                    <i class="glyphicon glyphicon-envelope"></i>&emsp;{{ current_user.email }}
-                    <br>
-
+                    {% if user is defined and user != None %}
+                        <i class="glyphicon glyphicon-envelope"></i>&emsp;{{ current_user.email }}
+                        <br>
+                    {% endif %}
                     <u><h4 class="profile-label">Недавние треды</h4></u>
                     {% for thread in current_user.threads.all()[-7:]|reverse  %}
                         <p>
