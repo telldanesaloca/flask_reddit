@@ -14,7 +14,7 @@
               <div class="">
                   {% if user is defined and user != None and thread.has_voted(user.id) %}
                       <a data-voted="true" style="color:#eb6864;" href="javascript:void(0)" 
-                          class="listing-vote-button">▲</a>
+                          class="listing-vote-button">▼</a>
                   {% else %}
                       <a data-voted="false" style="color:#000;" href="javascript:void(0)" 
                           class="listing-vote-button">▲</a>
@@ -38,7 +38,7 @@
 
               <div class="post-listing-meta">
                   <a href="{{ config.ROOT_URL }}/threads/{{ thread.subreddit.name }}/{{ thread.id }}/{{ thread.title|truncate(100)|replace(' ', '_') }}">
-                  {{ thread.comments.all()|length() }} комментарии</a>,
+                  Комментариев: {{ thread.comments.all()|length() }}</a>,
                   {{ thread.pretty_date() }}, от 
                   <a href="{{ url_for('users.home_page', 
                         username=thread.user.username) }}">
