@@ -33,7 +33,14 @@
               {% else %}
               <a href="{{ config.ROOT_URL }}/threads/{{ thread.subreddit.name }}/{{ thread.id }}/{{ thread.title|truncate(100)|replace(' ', '_') }}" class="listing-title">
               {% endif %}
-                <h4 class="listing-title-text">{{ thread.title }}</h4>
+              <h4 class="listing-title-text">{{ thread.title }}
+              {% if thread.link %}
+              <small> (url)</small>
+              {% endif %}
+              {% if thread.text %}
+              <small> (txt)</small>
+              {% endif %}              
+              </h4>
               </a>
 
               <div class="post-listing-meta">
